@@ -258,4 +258,22 @@
     function openCity(e, city){
       e.stopPropagation();
       const data = cityInfo[city];
-      document.getElemen
+      document.getElementById("cityTitle").textContent = city;
+
+      document.getElementById("cityBody").innerHTML = `
+        <p><b>Diyalekto:</b> ${data.dialect}</p>
+        <p><b>Pista:</b> ${data.festival}</p>
+        <p><b>Pasyalan:</b></p>
+        <ul>${data.spots.map(s => `<li>${s}</li>`).join("")}</ul>
+        <p><b>Kasaysayan:</b> ${data.history}</p>
+      `;
+
+      document.getElementById("cityModal").classList.add("show");
+    }
+
+    function closeCity(){
+      document.getElementById("cityModal").classList.remove("show");
+    }
+  </script>
+</body>
+</html>
