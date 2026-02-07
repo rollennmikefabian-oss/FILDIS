@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Central Luzon → Nueva Ecija Interactive Map</title>
 
   <style>
@@ -26,20 +27,38 @@
       width:100%;
       display:block;
       border:3px solid #333;
+      border-radius:12px;
     }
 
     /* dots */
     .dot{
       position:absolute;
-      width:28px;
-      height:28px;
+      width:26px;
+      height:26px;
       border-radius:50%;
-      background: rgba(255,0,0,0.70);
+      background: rgba(255,0,0,0.75);
       border:2px solid #fff;
       cursor:pointer;
       transform: translate(-50%, -50%);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+      z-index: 2;
     }
     .dot:hover{ background: rgba(255,0,0,1); }
+
+    /* small label for province dots */
+    .dot-label{
+      position:absolute;
+      transform: translate(-50%, -50%);
+      margin-top: 22px;
+      padding: 4px 8px;
+      font-size: 12px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid #333;
+      border-radius: 999px;
+      pointer-events:none;
+      z-index: 2;
+      white-space: nowrap;
+    }
 
     .blur{ filter: blur(6px); }
 
@@ -53,6 +72,7 @@
       align-items:center;
       justify-content:center;
       padding:16px;
+      z-index: 50;
     }
     .overlay.show{ display:flex; }
 
@@ -79,12 +99,12 @@
     #ne-map{
       width:100%;
       display:block;
-      transform: scale(0.85);
+      transform: scale(0.90);
       opacity:0;
       transition: transform .45s ease, opacity .25s ease;
     }
     #ne-map.zoom-in{
-      transform: scale(1.15);
+      transform: scale(1.12);
       opacity:1;
     }
 
@@ -94,7 +114,10 @@
       border-radius:10px;
       cursor:pointer;
       width:min(240px, 60vw);
+      background:#222;
+      color:#fff;
     }
+    .closeBtn:hover{ opacity:0.9; }
 
     /* === City Info Modal === */
     .modal{
@@ -105,6 +128,7 @@
       align-items:center;
       justify-content:center;
       padding:16px;
+      z-index: 60; /* above overlay */
     }
     .modal.show{ display:flex; }
 
@@ -127,26 +151,32 @@
       border-radius:10px;
       cursor:pointer;
       margin-top:10px;
+      background:#222;
+      color:#fff;
     }
+    .modal-card button:hover{ opacity:0.9; }
 
-    /* label hint (optional) */
     .hint{ margin:6px 0 0; font-size: 14px; color:#333; }
   </style>
 </head>
 
 <body>
   <h2>🗺️ Central Luzon Interactive Map</h2>
-  <p>Click the dot in <b>Nueva Ecija</b> to zoom to the province map.</p>
+  <p>Click the dot in <b>Nueva Ecija</b> to open the province map.</p>
 
   <!-- CENTRAL LUZON -->
   <div id="map-container">
-    <img id="map-image" src="https://upload.wikimedia.org/wikipedia/commons/5/55/Central_Luzon_Map.png" alt="Central Luzon Map">
+    <img id="map-image"
+         src="https://upload.wikimedia.org/wikipedia/commons/5/55/Central_Luzon_Map.png"
+         alt="Central Luzon Map">
 
-    <!-- Province dot (approx location for Nueva Ecija) -->
+    <!-- ✅ Province dot (Nueva Ecija) -->
+    <!-- NOTE: Adjust top/left until it sits on Nueva Ecija in THIS exact map image -->
     <div class="dot"
-         style="top: 48%; left: 56%;"
+         style="top: 41%; left: 63%;"
          onclick="openNuevaEcija()"
          title="Nueva Ecija"></div>
+    <div class="dot-label" style="top: 41%; left: 63%;">Nueva Ecija</div>
   </div>
 
   <!-- NUEVA ECIJA OVERLAY -->
@@ -156,7 +186,9 @@
       <p class="hint">Click a city dot to view information.</p>
 
       <div class="province-map-wrap">
-        <img id="ne-map" src="https://www.researchgate.net/publication/321750920/figure/fig2/AS:570776814604288@1513095205148/The-map-of-the-Province-of-Nueva-Ecija-Philippines-Source-Google-Map.png" alt="Nueva Ecija Map">
+        <img id="ne-map"
+             src="https://www.researchgate.net/publication/321750920/figure/fig2/AS:570776814604288@1513095205148/The-map-of-the-Province-of-Nueva-Ecija-Philippines-Source-Google-Map.png"
+             alt="Nueva Ecija Map">
 
         <!-- City dots (approx positions; adjust later) -->
         <div class="dot"
@@ -260,4 +292,3 @@
   </script>
 </body>
 </html>
-
