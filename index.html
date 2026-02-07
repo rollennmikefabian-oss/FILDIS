@@ -14,11 +14,12 @@
       padding:20px;
     }
 
-    /* === Central Luzon Map === */
+    /* === Central Luzon Map (SMALLER) === */
     #map-container{
       position:relative;
       display:inline-block;
-      width:min(900px, 95vw);
+      width: 650px;       /* 🔽 smaller map */
+      max-width: 95vw;
       margin-top:12px;
       transition: filter .35s ease;
     }
@@ -45,7 +46,6 @@
     }
     .dot:hover{ background: rgba(255,0,0,1); }
 
-    /* small label for province dots */
     .dot-label{
       position:absolute;
       transform: translate(-50%, -50%);
@@ -56,28 +56,27 @@
       border: 1px solid #333;
       border-radius: 999px;
       pointer-events:none;
-      z-index: 2;
       white-space: nowrap;
     }
 
     .blur{ filter: blur(6px); }
 
-    /* === Province Overlay (Nueva Ecija) === */
+    /* === Province Overlay === */
     .overlay{
       position:fixed;
       inset:0;
       background: rgba(0,0,0,0.45);
       backdrop-filter: blur(3px);
-      display:none;              /* hidden by default */
+      display:none;
       align-items:center;
       justify-content:center;
       padding:16px;
-      z-index: 50;
+      z-index:50;
     }
     .overlay.show{ display:flex; }
 
     .panel{
-      width:min(900px, 96vw);
+      width:min(760px, 96vw);   /* 🔽 smaller panel */
       background:#fff;
       border-radius:12px;
       padding:14px;
@@ -87,24 +86,23 @@
 
     .province-map-wrap{
       position:relative;
-      width:min(820px, 94vw);
-      margin:10px auto 8px;
+      width: 600px;            /* 🔽 smaller Nueva Ecija map */
+      max-width: 94vw;
+      margin:10px auto;
       overflow:hidden;
       border-radius:12px;
       border:2px solid #333;
-      background:#fff;
     }
 
-    /* Nueva Ecija map (this is what zooms) */
     #ne-map{
       width:100%;
       display:block;
-      transform: scale(0.90);
+      transform: scale(0.92);
       opacity:0;
       transition: transform .45s ease, opacity .25s ease;
     }
     #ne-map.zoom-in{
-      transform: scale(1.12);
+      transform: scale(1.1);
       opacity:1;
     }
 
@@ -113,13 +111,12 @@
       border:none;
       border-radius:10px;
       cursor:pointer;
-      width:min(240px, 60vw);
+      width:220px;
       background:#222;
       color:#fff;
     }
-    .closeBtn:hover{ opacity:0.9; }
 
-    /* === City Info Modal === */
+    /* === City Modal === */
     .modal{
       position:fixed;
       inset:0;
@@ -128,22 +125,25 @@
       align-items:center;
       justify-content:center;
       padding:16px;
-      z-index: 60; /* above overlay */
+      z-index:60;
     }
     .modal.show{ display:flex; }
 
     .modal-card{
-      width:min(420px, 95vw);
+      width:400px;
+      max-width:95vw;
       background:#fff;
       border-radius:12px;
       padding:16px;
-      text-align:left;
       box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      text-align:left;
     }
+
     .modal-card h3{
       margin:0 0 10px;
       text-align:center;
     }
+
     .modal-card button{
       width:100%;
       padding:10px;
@@ -154,9 +154,12 @@
       background:#222;
       color:#fff;
     }
-    .modal-card button:hover{ opacity:0.9; }
 
-    .hint{ margin:6px 0 0; font-size: 14px; color:#333; }
+    .hint{
+      margin:6px 0;
+      font-size:14px;
+      color:#333;
+    }
   </style>
 </head>
 
@@ -170,8 +173,6 @@
          src="https://upload.wikimedia.org/wikipedia/commons/5/55/Central_Luzon_Map.png"
          alt="Central Luzon Map">
 
-    <!-- ✅ Province dot (Nueva Ecija) -->
-    <!-- NOTE: Adjust top/left until it sits on Nueva Ecija in THIS exact map image -->
     <div class="dot"
          style="top: 41%; left: 63%;"
          onclick="openNuevaEcija()"
@@ -190,38 +191,33 @@
              src="https://www.researchgate.net/publication/321750920/figure/fig2/AS:570776814604288@1513095205148/The-map-of-the-Province-of-Nueva-Ecija-Philippines-Source-Google-Map.png"
              alt="Nueva Ecija Map">
 
-        <!-- City dots (approx positions; adjust later) -->
         <div class="dot"
              style="top: 55%; left: 48%;"
-             onclick="openCity(event, 'Cabanatuan City')"
-             title="Cabanatuan City"></div>
+             onclick="openCity(event, 'Cabanatuan City')"></div>
 
         <div class="dot"
              style="top: 40%; left: 55%;"
-             onclick="openCity(event, 'San Jose City')"
-             title="San Jose City"></div>
+             onclick="openCity(event, 'San Jose City')"></div>
 
         <div class="dot"
              style="top: 70%; left: 60%;"
-             onclick="openCity(event, 'Gapan City')"
-             title="Gapan City"></div>
+             onclick="openCity(event, 'Gapan City')"></div>
       </div>
 
       <button class="closeBtn" onclick="closeNuevaEcija()">Close Province</button>
     </div>
   </div>
 
-  <!-- CITY INFO MODAL -->
+  <!-- CITY MODAL -->
   <div id="cityModal" class="modal" onclick="closeCity()">
     <div class="modal-card" onclick="event.stopPropagation()">
-      <h3 id="cityTitle">City</h3>
+      <h3 id="cityTitle"></h3>
       <div id="cityBody"></div>
       <button onclick="closeCity()">Close</button>
     </div>
   </div>
 
   <script>
-    // City data (add more anytime)
     const cityInfo = {
       "Cabanatuan City": {
         dialect: "Tagalog, Ilocano",
@@ -231,64 +227,35 @@
       },
       "San Jose City": {
         dialect: "Tagalog, Ilocano",
-        festival: "Tanduyong Festival (sample)",
-        spots: ["Public Market area (sample)", "Local parks (sample)"],
-        history: "Kilalang agricultural area sa Nueva Ecija (sample text)."
+        festival: "Tanduyong Festival",
+        spots: ["Public Market", "Local Parks"],
+        history: "Kilalang agricultural city sa Nueva Ecija."
       },
       "Gapan City": {
         dialect: "Tagalog, Ilocano",
-        festival: "Taong Putik Festival (sample)",
-        spots: ["Heritage houses (sample)", "Church landmarks (sample)"],
-        history: "Isa sa mga lumang pamayanan sa Nueva Ecija (sample text)."
+        festival: "Taong Putik Festival",
+        spots: ["Heritage Houses", "Church Landmarks"],
+        history: "Isa sa pinakamatandang lungsod sa Nueva Ecija."
       }
     };
 
     function openNuevaEcija(){
-      // blur Central Luzon map behind
       document.getElementById("map-container").classList.add("blur");
-
-      // show overlay
       document.getElementById("neOverlay").classList.add("show");
 
-      // trigger zoom animation on NE map
       const neMap = document.getElementById("ne-map");
       neMap.classList.remove("zoom-in");
-      void neMap.offsetWidth; // restart animation
+      void neMap.offsetWidth;
       neMap.classList.add("zoom-in");
     }
 
     function closeNuevaEcija(){
       document.getElementById("neOverlay").classList.remove("show");
       document.getElementById("map-container").classList.remove("blur");
-      closeCity(); // close city modal if open
+      closeCity();
     }
 
-    // event param para hindi mag-close overlay kapag nagclick ng dot
-    function openCity(e, cityName){
+    function openCity(e, city){
       e.stopPropagation();
-
-      const data = cityInfo[cityName];
-      document.getElementById("cityTitle").textContent = cityName;
-
-      // fallback if missing data
-      if(!data){
-        document.getElementById("cityBody").innerHTML = "<p>No data yet.</p>";
-      } else {
-        document.getElementById("cityBody").innerHTML = `
-          <p><b>Diyalekto:</b> ${data.dialect}</p>
-          <p><b>Pista:</b> ${data.festival}</p>
-          <p><b>Pasyalan:</b></p>
-          <ul>${data.spots.map(s => `<li>${s}</li>`).join("")}</ul>
-          <p><b>Maikling Kasaysayan:</b> ${data.history}</p>
-        `;
-      }
-
-      document.getElementById("cityModal").classList.add("show");
-    }
-
-    function closeCity(){
-      document.getElementById("cityModal").classList.remove("show");
-    }
-  </script>
-</body>
-</html>
+      const data = cityInfo[city];
+      document.getElemen
